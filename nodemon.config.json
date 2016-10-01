@@ -1,0 +1,11 @@
+{
+  "verbose": true,
+  "exec": "npm run electron",
+  "watch": [
+    "electron"
+  ],
+  "ext": "js",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

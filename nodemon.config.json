@@ -2,7 +2,7 @@
   "verbose": true,
   "exec": "npm run electron",
   "watch": [
-    "electron"
+    "app"
   ],
   "ext": "js",
   "env": {

@@ -10,14 +10,14 @@ const menuTemplate = [{
       const options = {
         properties: ['openFile'],
         filters: [
-          { name: 'i18n files', extensions: ['.i18n.json'] },
+          { name: 'i18n files', extensions: ['i18n.json'] },
           { name: 'All files', extensions: ['*'] },
         ],
       };
       const result = dialog.showOpenDialog(options);
 
       if (result) {
-        app.emit('file', result);
+        app.emit('load-file', result);
       }
     },
   }],

@@ -4,6 +4,8 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const { promisifyAll } = require('bluebird');
 const { readFileAsync } = promisifyAll(require('fs'));
 
+const { parse } = require('./i18n');
+
 class MainWindow extends BrowserWindow {
   constructor(href) {
     super({
@@ -15,21 +17,21 @@ class MainWindow extends BrowserWindow {
 
     this.loadURL(href);
 
-    ipcMain.on('loadFile', (event, arg) => {
-      this.loadFile(arg.path)
-        .then(file => event.sender.send('fileLoaded', file));
-    });
-
-    console.log(this.webContents);
-    app.on('file', (files) => {
+    app.on('load-file', (files) => {
       this.loadFile(files[0])
-        .then(file => this.webContents.send('file', file));
+        .then(file => this.webContents.send('file-loaded', file));
     });
   }
 
   loadFile(path) {
     return readFileAsync(path)
-      .then(file => file.toString());
+      .then(file => file.toString())
+      .then(parse)
+      .then((data) => {
+        this.file = data;
+
+        return data;
+      });
   }
 }
 

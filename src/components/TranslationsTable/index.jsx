@@ -1,8 +1,9 @@
 import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
 
 import styles from './translations-table.css';
 
-export default function TranslationsTable(props) {
+function TranslationsTable(props) {
   return (
     <table className={styles.table}>
       <thead>
@@ -12,7 +13,7 @@ export default function TranslationsTable(props) {
         </tr>
       </thead>
       <tbody>
-        {props.translates.map(t => (
+        {props.translations.map(t => (
           <tr key={t.key}>
             <td>{t.key}</td>
             <td>{t.value}</td>
@@ -27,4 +28,12 @@ TranslationsTable.propTypes = PropTypes.arrayOf(PropTypes.shape({
   key: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
 })).isRequired;
+
+function mapStateToProps(state) {
+  return {
+    translations: state.translations,
+  };
+}
+
+export default connect(mapStateToProps)(TranslationsTable);
 

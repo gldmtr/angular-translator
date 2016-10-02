@@ -1,6 +1,7 @@
 'use strict';
 
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { unionBy, sortBy } = require('lodash');
+const { app, BrowserWindow } = require('electron');
 const { promisifyAll } = require('bluebird');
 const { readFileAsync } = promisifyAll(require('fs'));
 
@@ -21,6 +22,11 @@ class MainWindow extends BrowserWindow {
       this.loadFile(files[0])
         .then(file => this.webContents.send('file-loaded', file));
     });
+
+    app.on('merge-file', (files) => {
+      this.mergeFile(files[0])
+        .then(file => this.webContents.send('file-loaded', file));
+    });
   }
 
   loadFile(path) {
@@ -28,9 +34,20 @@ class MainWindow extends BrowserWindow {
       .then(file => file.toString())
       .then(parse)
       .then((data) => {
-        this.file = data;
+        this.file = sortBy(data, 'key');
 
-        return data;
+        return this.file;
+      });
+  }
+
+  mergeFile(path) {
+    return readFileAsync(path)
+      .then(file => file.toString())
+      .then(parse)
+      .then((data) => {
+        this.file = sortBy(unionBy(this.file, data, 'key'), 'key');
+
+        return this.file;
       });
   }
 }

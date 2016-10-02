@@ -6,6 +6,7 @@ const menuTemplate = [{
   label: 'File',
   submenu: [{
     label: 'Open',
+    accelerator: 'CmdOrCtrl+O',
     click() {
       const options = {
         properties: ['openFile'],
@@ -18,6 +19,23 @@ const menuTemplate = [{
 
       if (result) {
         app.emit('load-file', result);
+      }
+    },
+  }, {
+    label: 'Merge',
+    accelerator: 'CmdOrCtrl+M',
+    click() {
+      const options = {
+        properties: ['openFile'],
+        filters: [
+          { name: 'i18n files', extensions: ['i18n.json'] },
+          { name: 'All files', extensions: ['*'] },
+        ],
+      };
+      const result = dialog.showOpenDialog(options);
+
+      if (result) {
+        app.emit('merge-file', result);
       }
     },
   }],

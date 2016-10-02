@@ -15,6 +15,7 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js',
   },
+  target: 'electron-renderer',
 
   resolve: {
     extensions: ['', '.jsx', '.js', '.html'],

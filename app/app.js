@@ -17,7 +17,7 @@ const angularTranslator = {
     });
 
     app.on('ready', () => {
-      // buildMenu();
+      buildMenu();
       this.mainWindow = new MainWindow(config.indexHtml);
     });
   },

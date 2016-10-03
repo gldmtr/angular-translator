@@ -6,3 +6,11 @@
 .table td, .table th {
 	border: 1px solid black;
 }
+
+.new {
+	color: green;
+}
+
+.old {
+	color: red;
+}

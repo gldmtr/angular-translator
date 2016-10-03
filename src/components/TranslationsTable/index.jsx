@@ -14,7 +14,15 @@ function TranslationsTable(props) {
       </thead>
       <tbody>
         {props.translations.map(t => (
-          <tr key={t.key}>
+          <tr key={t.key} className={(
+            () => {
+              switch (t.state) {
+                case 'old': return styles.old;
+                case 'new': return styles.new;
+                default: return '';
+              }
+            }
+          )()}>
             <td>{t.key}</td>
             <td>{t.value}</td>
           </tr>
@@ -27,6 +35,7 @@ function TranslationsTable(props) {
 TranslationsTable.propTypes = PropTypes.arrayOf(PropTypes.shape({
   key: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
+  state: PropTypes.string,
 })).isRequired;
 
 function mapStateToProps(state) {

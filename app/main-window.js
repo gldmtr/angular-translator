@@ -1,6 +1,6 @@
 'use strict';
 
-const { unionBy, sortBy } = require('lodash');
+const { differenceBy, unionBy, sortBy } = require('lodash');
 const { app, BrowserWindow } = require('electron');
 const { promisifyAll } = require('bluebird');
 const { readFileAsync } = promisifyAll(require('fs'));
@@ -33,6 +33,7 @@ class MainWindow extends BrowserWindow {
     return readFileAsync(path)
       .then(file => file.toString())
       .then(parse)
+      .map(item => Object.assign({}, item, { state: 'present' }))
       .then((data) => {
         this.file = sortBy(data, 'key');
 
@@ -44,8 +45,12 @@ class MainWindow extends BrowserWindow {
     return readFileAsync(path)
       .then(file => file.toString())
       .then(parse)
-      .then((data) => {
-        this.file = sortBy(unionBy(this.file, data, 'key'), 'key');
+      .map(item => Object.assign({}, item, { state: 'new' }))
+      .then((newItems) => {
+        const old = differenceBy(this.file, newItems, 'key')
+          .map(item => Object.assign({}, item, { state: 'old' }));
+
+        this.file = sortBy(unionBy(old, this.file, newItems, 'key'), 'key');
 
         return this.file;
       });

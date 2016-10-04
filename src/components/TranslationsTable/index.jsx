@@ -7,22 +7,35 @@ function TranslationsTable(props) {
   return (
     <table className={styles.table}>
       <thead>
-        <tr>
-          <th>Key</th>
-          <th>Value</th>
-        </tr>
+        {(
+          () => {
+            if (props.translations.length) {
+              return (
+                <tr>
+                  <th>Key</th>
+                  <th>Value</th>
+                </tr>
+              );
+            }
+
+            return null;
+          }
+        )()}
       </thead>
       <tbody>
         {props.translations.map(t => (
-          <tr key={t.key} className={(
-            () => {
-              switch (t.state) {
-                case 'old': return styles.old;
-                case 'new': return styles.new;
-                default: return '';
+          <tr
+            key={t.key}
+            className={(
+              () => {
+                switch (t.state) {
+                  case 'old': return styles.old;
+                  case 'new': return styles.new;
+                  default: return '';
+                }
               }
-            }
-          )()}>
+            )()}
+          >
             <td>{t.key}</td>
             <td>{t.value}</td>
           </tr>

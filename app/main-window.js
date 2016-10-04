@@ -3,9 +3,10 @@
 const { differenceBy, unionBy, sortBy } = require('lodash');
 const { app, BrowserWindow } = require('electron');
 const { promisifyAll } = require('bluebird');
-const { readFileAsync } = promisifyAll(require('fs'));
+const { readFileAsync, writeFileAsync } = promisifyAll(require('fs'));
 
-const { parse } = require('./i18n');
+const { isDevelopment } = require('./config');
+const { parse, stringify } = require('./i18n');
 
 class MainWindow extends BrowserWindow {
   constructor(href) {
@@ -14,18 +15,36 @@ class MainWindow extends BrowserWindow {
       height: 600,
       devTools: true,
     });
-    this.webContents.openDevTools();
+
+    if (isDevelopment) {
+      this.webContents.openDevTools();
+    }
 
     this.loadURL(href);
 
     app.on('load-file', (files) => {
-      this.loadFile(files[0])
+      this.filePath = files[0];
+
+      this.loadFile(this.filePath)
         .then(file => this.webContents.send('file-loaded', file));
     });
 
     app.on('merge-file', (files) => {
       this.mergeFile(files[0])
         .then(file => this.webContents.send('file-loaded', file));
+    });
+
+    app.on('save-file', (file) => {
+      if (!this.file) {
+        return;
+      }
+
+      if (file) {
+        this.filePath = file;
+      }
+
+      this.saveFile(this.filePath)
+        .then(() => this.webContents.send('file-loaded', this.file));
     });
   }
 
@@ -55,6 +74,15 @@ class MainWindow extends BrowserWindow {
         return this.file;
       });
   }
+
+  saveFile(path) {
+    this.file = this.file.map(item => Object.assign({}, item, { state: 'present' }));
+
+    const json = stringify(this.file);
+
+    return writeFileAsync(path, json);
+  }
 }
 
 module.exports = MainWindow;
+

@@ -38,6 +38,29 @@ const menuTemplate = [{
         app.emit('merge-file', result);
       }
     },
+  }, {
+    label: 'Save',
+    accelerator: 'CmdOrCtrl+S',
+    click() {
+      app.emit('save-file');
+    },
+  }, {
+    label: 'Save As',
+    accelerator: 'CmdOrCtrl+Shift+S',
+    click() {
+      const options = {
+        properties: ['saveFile'],
+        filters: [
+          { name: 'i18n files', extensions: ['i18n.json'] },
+          { name: 'All files', extensions: ['*'] },
+        ],
+      };
+      const result = dialog.showSaveDialog(options);
+
+      if (result) {
+        app.emit('save-file', result);
+      }
+    },
   }],
 }];
 

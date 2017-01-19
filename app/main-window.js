@@ -1,6 +1,6 @@
 'use strict';
 
-const { differenceBy, unionBy, sortBy } = require('lodash');
+const { cloneDeep, differenceBy, filter, map, unionBy, sortBy } = require('lodash');
 const { app, BrowserWindow } = require('electron');
 const { promisifyAll } = require('bluebird');
 const { readFileAsync, writeFileAsync } = promisifyAll(require('fs'));
@@ -31,6 +31,11 @@ class MainWindow extends BrowserWindow {
 
     app.on('merge-file', (files) => {
       this.mergeFile(files[0])
+        .then(file => this.webContents.send('file-loaded', file));
+    });
+
+    app.on('apply-diff', (files) => {
+      this.applyDiff()
         .then(file => this.webContents.send('file-loaded', file));
     });
 
@@ -69,14 +74,25 @@ class MainWindow extends BrowserWindow {
         const old = differenceBy(this.file, newItems, 'key')
           .map(item => Object.assign({}, item, { state: 'old' }));
 
-        this.file = sortBy(unionBy(old, this.file, newItems, 'key'), 'key');
+        this.file = sortBy(unionBy(old, this.file, newItems, 'key'), ['state', 'key']);
+
+        return this.file;
+      });
+  }
+
+  applyDiff() {
+    return Promise.resolve()
+      .then(() => {
+        const newFile = filter(cloneDeep(this.file), ({ state }) => state !== 'old' );
+
+        this.file = newFile;
 
         return this.file;
       });
   }
 
   saveFile(path) {
-    this.file = this.file.map(item => Object.assign({}, item, { state: 'present' }));
+    this.file = map(this.file, item => Object.assign({}, item, { state: 'present' }));
 
     const json = stringify(this.file);
 

@@ -39,6 +39,12 @@ const menuTemplate = [{
       }
     },
   }, {
+    label: 'Apply diff',
+    accelerator: 'CmdOrCtrl+A',
+    click() {
+      app.emit('apply-diff');
+    },
+  }, {
     label: 'Save',
     accelerator: 'CmdOrCtrl+S',
     click() {
